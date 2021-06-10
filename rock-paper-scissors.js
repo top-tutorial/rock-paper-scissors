@@ -1,8 +1,26 @@
 
-function computerPlay() {
-    let choices = ['Rock', 'Paper', 'Scissors'];
-    return choices[Math.floor(Math.random()*3)];
-}
+let playerStats = 0;
+let computerStats = 0;
+
+let _score = document.querySelector('.score');
+let _playerSelection = document.querySelector('.player');
+let _computerSelection = document.querySelector('.computer');
+
+let buttons = document.querySelectorAll('button');
+buttons.forEach(button => 
+    button.addEventListener('click', () => {
+        if(!isGameEnd()) {
+            let playerSelection = button.textContent;
+            let computerSelection = computerPlay()
+            let result = playRound(playerSelection, computerSelection);
+            
+            updateChoices(playerSelection, computerSelection);
+            updateStats(result, playerSelection, computerSelection);
+        }
+        else
+            declareOverallResult();   
+    }
+    ));
 
 function playRound(playerSelection, computerSelection) {
     playerSelection = playerSelection.toUpperCase();
@@ -20,41 +38,59 @@ function playRound(playerSelection, computerSelection) {
     }
 }
 
+function updateChoices(playerSelection, computerSelection) {
+    _playerSelection.textContent = `Player: ${playerSelection}`;
+    _computerSelection.textContent = `Computer: ${computerSelection}`;
+}
+
+function resetChoices() {
+    _playerSelection.textContent = `Player: Picking...`;
+    _computerSelection.textContent = `Computer: Picking...`;
+}
+
+function updateStats(result, playerSelection, computerSelection) {
+    let declareWinner;
+    if(result === 1) {
+        playerStats++;
+        declareWinner = `Player wins! ${playerSelection} beats ${computerSelection}`;
+    }
+    else if(result === -1) {
+        declareWinner = 'It\'s a draw!';
+    }
+    else {
+        computerStats++;
+        declareWinner = `Computer wins! ${computerSelection} beats ${playerSelection}`;
+    }
+
+    setTimeout(() => {
+        alert(declareWinner);
+        resetChoices();
+        updateScore();
+        
+    }, 0);
+    
+}
+
+function updateScore() {
+    _score.textContent = `${playerStats}:${computerStats}`;
+}
+
+function isGameEnd() {
+    return playerStats === 5 || computerStats === 5;
+}
+
+function computerPlay() {
+    let choices = ['Rock', 'Paper', 'Scissors'];
+    return choices[Math.floor(Math.random()*3)];
+}
+
 function capitalize(string) {
     let newString = string.toLowerCase().split("");
     newString[0] = newString[0].toUpperCase();
     return newString.join("");
 }
 
-function declareOverallResult(playerStats, computerStats) {
-    console.log(playerStats === computerStats ? `It's a draw ${playerStats}:${computerStats}`
+function declareOverallResult() {
+    alert(playerStats === computerStats ? `It's a draw ${playerStats}:${computerStats}`
     : playerStats > computerStats ? `Player wins: ${playerStats}:${computerStats}` : `Computer wins ${computerStats}:${playerStats}`);
 }
-
-function game() {
-    let playerStats = 0;
-    let computerStats = 0;
-
-    for(let i = 0; i < 5; i++) {
-        let computerSelection = computerPlay();
-        let playerSelection = capitalize(prompt('Pick between rock, paper, scissors: ', 'rock'));
-        let result = playRound(playerSelection, computerSelection);
-
-        let declareWinner;
-        if(result === 1) {
-            playerStats++;
-            declareWinner = `Player wins! ${playerSelection} beats ${computerSelection}`;
-        }
-        else if(result === -1) {
-            declareWinner = 'It\'s a draw!';
-        }
-        else {
-            computerStats++;
-            declareWinner = `Computer wins! ${computerSelection} beats ${playerSelection}`;
-        }
-            console.log(declareWinner);
-    }
-    declareOverallResult(playerStats, computerStats);
-}
-
-game();

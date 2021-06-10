@@ -1,0 +1,34 @@
+body {
+    box-sizing: border-box;
+    margin: 0;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+button {
+   font-size: 1.5rem;
+   margin-right: 1rem;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+
+    font-size: 2.5rem;
+    margin-bottom: 2em;
+}
+
+.computer {
+    margin-left: 1em
+}
+
+#player-label {
+    margin-right: 1em;
+}
+
+#computer-label {
+    margin-left: 1em;
+}
