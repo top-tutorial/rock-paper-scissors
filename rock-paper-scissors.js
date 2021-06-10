@@ -7,35 +7,67 @@ let _playerSelection = document.querySelector('.player');
 let _computerSelection = document.querySelector('.computer');
 
 let buttons = document.querySelectorAll('button');
-buttons.forEach(button => 
-    button.addEventListener('click', () => {
-        if(!isGameEnd()) {
-            let playerSelection = button.textContent;
-            let computerSelection = computerPlay()
-            let result = playRound(playerSelection, computerSelection);
-            
-            updateChoices(playerSelection, computerSelection);
-            updateStats(result, playerSelection, computerSelection);
-        }
-        else
-            declareOverallResult();   
+buttons.forEach(button => button.addEventListener('click', () => play(button) ));
+
+function play(button) {
+    if(!isGameEnd()) {
+        let playerSelection = button.textContent;
+        let computerSelection = computerPlay()
+
+        playRound(playerSelection, computerSelection);    
     }
-    ));
+    else {
+        declareOverallResult();
+        askPlayAgain();
+    }
+}
+
+function declareOverallResult() {
+    alert(playerStats === computerStats ? `It's a draw ${playerStats}:${computerStats}`
+    : playerStats > computerStats ? `Player wins: ${playerStats}:${computerStats}` : `Computer wins ${computerStats}:${playerStats}`);
+}
+
+function askPlayAgain() {
+    if(confirm('Play Again?')) {
+        playerStats = 0;
+        computerStats = 0;
+        updateScore();
+    }
+}
 
 function playRound(playerSelection, computerSelection) {
     playerSelection = playerSelection.toUpperCase();
     computerSelection = computerSelection.toUpperCase();
-    let outcome = playerSelection.concat(computerSelection);
 
-    if(playerSelection == computerSelection)
-        return -1;
-    
+    let outcome = playerSelection.concat(computerSelection);
+    let result = checkWinner(outcome, playerSelection, computerSelection);
+
+    updateChoices(playerSelection, computerSelection);
+    updateStats(result, playerSelection, computerSelection);
+    updateScore();
+
+    setTimeout(() => {
+        if(isGameEnd())
+            askPlayAgain();
+    }, 10);
+   
+    return result;
+}
+
+function checkWinner(outcome, playerSelection, computerSelection) {
+    let result; 
+
     switch(outcome) {
         case 'ROCKSCISSORS':
         case 'PAPERROCK':
-        case 'SCISSORSPAPER': return 1;
-        default: return 0;
+        case 'SCISSORSPAPER': result = 1; break;
+        default: result = 0;
     }
+
+    if(playerSelection == computerSelection)
+        result = -1;
+
+    return result;
 }
 
 function updateChoices(playerSelection, computerSelection) {
@@ -49,26 +81,29 @@ function resetChoices() {
 }
 
 function updateStats(result, playerSelection, computerSelection) {
-    let declareWinner;
-    if(result === 1) {
-        playerStats++;
-        declareWinner = `Player wins! ${playerSelection} beats ${computerSelection}`;
-    }
-    else if(result === -1) {
-        declareWinner = 'It\'s a draw!';
-    }
-    else {
-        computerStats++;
-        declareWinner = `Computer wins! ${computerSelection} beats ${playerSelection}`;
+    switch (result) {
+        case 1: playerStats++; break;
+        case 0: computerStats++; break;
     }
 
     setTimeout(() => {
-        alert(declareWinner);
+        declareWinner(result, playerSelection, computerSelection);
         resetChoices();
-        updateScore();
-        
     }, 0);
-    
+}
+
+function declareWinner(result, playerSelection, computerSelection) {
+    let declareWinner;
+
+    switch(result) {
+        case 1:  declareWinner = `Player wins! ${playerSelection} beats ${computerSelection}`;
+                 break;
+        case 0:  declareWinner = `Computer wins! ${computerSelection} beats ${playerSelection}`;
+                 break;
+        default: declareWinner = 'It\'s a draw!';
+                 break;
+    }
+    alert(declareWinner);
 }
 
 function updateScore() {
@@ -90,7 +125,3 @@ function capitalize(string) {
     return newString.join("");
 }
 
-function declareOverallResult() {
-    alert(playerStats === computerStats ? `It's a draw ${playerStats}:${computerStats}`
-    : playerStats > computerStats ? `Player wins: ${playerStats}:${computerStats}` : `Computer wins ${computerStats}:${playerStats}`);
-}
